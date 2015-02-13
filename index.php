@@ -8,21 +8,10 @@ Author: Hubbert
 Author URI: http://URI_Of_The_Plugin_Author作者地址
 Text Domain: yet_upyun
  */
-add_action('admin_menu', 'yet_upyun_menu');
-add_action('admin_init', 'yet_upyun_init');
 
 define('MENU_SLUG', 'yet-upyun');
 define('YET_UPYUN_DIR', dirname(__FILE__));
-include YET_UPYUN_DIR . '/lib/functions.php';
-
-function yet_upyun_menu() {
-    add_menu_page(
-        '又拍云加速',
-        '又拍云加速',
-        'manage_options',
-        MENU_SLUG,
-        'yet_upyun_menu_page');
-}
+define('YET_UPYUN_TEMPLATE_DIR', YET_UPYUN_DIR . '/template');
 
 if(get_option('host')) {
     define('UPYUN_CDN_HOST', get_option('host'));
@@ -39,9 +28,23 @@ if(get_option('operator_pwd')) {
 if(get_option('bucket_type')) {
     define('UPYUN_CDN_BUCKET_TYPE', get_option('bucket_type'));
 }
-if(get_option('bucket_dir')) {
-    define('UPYUN_CDN_BUCKET_DIR', get_option('bucket_dir'));
+
+include YET_UPYUN_DIR . '/lib/functions.php';
+include 'lib/sync-static-file.php';
+
+add_action('admin_menu', 'yet_upyun_menu');
+add_action('admin_init', 'yet_upyun_init');
+
+function yet_upyun_menu() {
+    add_menu_page(
+        '又拍云加速',
+        '又拍云加速',
+        'manage_options',
+        MENU_SLUG,
+        'yet_upyun_menu_page');
 }
+
+
 
 if(! is_admin()) {
     $upyun_service = true;
@@ -51,19 +54,17 @@ if(! is_admin()) {
         add_filter('script_loader_src', 'yet_upyun_filter_js');
     }
 } else {
-    include 'lib/sync-static-file.php';
-    add_action( 'wp_ajax_yet_upyun_sync_file', 'yet_upyun_sync_file_callback' );
+    add_action('wp_ajax_yet_upyun_sync_file', 'yet_upyun_sync_file_callback');
+    add_action('add_attachment', 'yet_upyun_sync_attachment');
 }
 
 function yet_upyun_init() {
     yet_upyun_register_basic_settings();
-    yet_upyun_register_file_settings();
     /*
     $plugin_dir = basename( dirname( __FILE__ ) );
     load_plugin_textdomain( 'yet_upyun', null, $plugin_dir );
     */
 }
-
 
 function yet_upyun_register_basic_settings() {
     register_setting( 'yet-upyun-basic', 'host' );
@@ -72,11 +73,8 @@ function yet_upyun_register_basic_settings() {
     register_setting( 'yet-upyun-basic', 'operator_pwd' );
     register_setting( 'yet-upyun-basic', 'bucket_type' );
     register_setting( 'yet-upyun-basic', 'bucket_dir' );
-}
-
-function yet_upyun_register_file_settings() {
-    register_setting( 'yet-upyun-file', 'yet_upyun_sync_dir' );
-    register_setting( 'yet-upyun-file', 'yet_upyun_sync_ext' );
+    register_setting( 'yet-upyun-basic', 'yet_upyun_sync_dir' );
+    register_setting( 'yet-upyun-basic', 'yet_upyun_sync_ext' );
 }
 
 function yet_upyun_admin_tabs($current = 'basic') {
@@ -92,6 +90,5 @@ function yet_upyun_admin_tabs($current = 'basic') {
 }
 
 function yet_upyun_menu_page() {
-    $dir = plugin_dir_path(__FILE__);
-    include $dir . 'template/header.php';
+    include YET_UPYUN_TEMPLATE_DIR . '/header.php';
 }

@@ -44,9 +44,19 @@
                 </td>
             </tr>
             <tr valign="top">
-                <th scope="row">文件存放目录</th>
+                <th scope="row">需要上传到CDN的文件后缀</th>
                 <td>
-                    <input type="text" name="bucket_dir" value="<?php echo esc_attr( get_option('bucket_dir') ); ?>" placeholder="wp_path"/>
+                    <input type="text" name="yet_upyun_sync_ext" value="<?php echo esc_attr( get_option('yet_upyun_sync_ext') ); ?>" placeholder="js|css|png|jpg|jpeg"/>
+                    <span>多个后缀以 | 分隔</span>
+                </td>
+            </tr>
+            <tr valign="top">
+                <th scope="row">静态文件目录</th>
+                <td>
+                    <input type="text" name="yet_upyun_sync_dir" value="<?php echo  esc_attr( get_option('yet_upyun_sync_dir') ); ?>" placeholder="wp-content|wp-includes"/>
+                    <p>
+                        <span>多个目录以 | 分隔</span>
+                    </p>
                 </td>
             </tr>
         </table>

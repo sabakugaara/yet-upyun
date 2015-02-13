@@ -46,3 +46,19 @@ function yet_upyun_sync_file_callback() {
 	}
 	wp_die(); // this is required to terminate immediately and return a proper response
 }
+
+function yet_upyun_sync_file($file_path, $base_path) {
+	global $upyun;
+	$upload_path = str_replace($base_path, '/', $file_path);
+	$auto_make_dir = true;
+	$upyun->writeFile($upload_path, fopen($file_path, 'rb'), $auto_make_dir );
+}
+
+function yet_upyun_sync_attachment($attachement_id) {
+	$file_url = wp_get_attachment_url($attachement_id);
+	$wpurl = get_bloginfo('wpurl');
+	if(is_cdn_file($file_url)) {
+		$file_path = str_replace($wpurl . '/', ABSPATH, $file_url);
+		yet_upyun_sync_file($file_path, ABSPATH);
+	}
+}
