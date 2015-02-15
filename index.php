@@ -31,6 +31,7 @@ if(get_option('bucket_type')) {
 
 include YET_UPYUN_DIR . '/lib/functions.php';
 include 'lib/sync-static-file.php';
+include 'lib/filters.php';
 
 add_action('admin_menu', 'yet_upyun_menu');
 add_action('admin_init', 'yet_upyun_init');
@@ -49,13 +50,17 @@ function yet_upyun_menu() {
 if(! is_admin()) {
     $upyun_service = true;
     if($upyun_service) {
-        include 'lib/filters.php';
         add_filter('the_content', 'yet_upyun_filter_content');
         add_filter('script_loader_src', 'yet_upyun_filter_js');
     }
 } else {
+    //手动同步所有文件
     add_action('wp_ajax_yet_upyun_sync_file', 'yet_upyun_sync_file_callback');
+    //上传附件时 同步原图
     add_action('add_attachment', 'yet_upyun_sync_attachment');
+    //上传附件时 同步缩略图
+    //由于没有找到合适的action， 试用该filter作为钩子
+    add_filter('wp_generate_attachment_metadata', 'yet_upyun_sync_thumbnail', 10, 2);
 }
 
 function yet_upyun_init() {
@@ -74,7 +79,7 @@ function yet_upyun_register_basic_settings() {
     register_setting( 'yet-upyun-basic', 'bucket_type' );
     register_setting( 'yet-upyun-basic', 'bucket_dir' );
     register_setting( 'yet-upyun-basic', 'yet_upyun_sync_dir' );
-    register_setting( 'yet-upyun-basic', 'yet_upyun_sync_ext' );
+    register_setting( 'yet-upyun-basic', 'yet_upyun_sync_ext');
 }
 
 function yet_upyun_admin_tabs($current = 'basic') {

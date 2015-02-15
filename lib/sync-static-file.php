@@ -35,6 +35,9 @@ function yet_upyun_sync_dir($source_dir, $base_path, $exts) {
 	closedir($dir);
 }
 
+/**
+ * ajax sync file callback
+ */
 function yet_upyun_sync_file_callback() {
 	global $wpdb; // this is how you get access to the database
 	$sync_dir = get_option('yet_upyun_sync_dir');

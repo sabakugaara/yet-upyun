@@ -33,3 +33,20 @@ function yet_upyun_replace_cdn_url($url) {
 	$cdnSrc = str_replace($wpurl, UPYUN_CDN_HOST, $url);
 	return $cdnSrc;
 }
+
+function yet_upyun_sync_thumbnail($metadata, $attachment_id) {
+	if ( ! isset( $metadata['sizes'] ) || ! is_array( $metadata['sizes'] ) ) {
+		return $metadata;
+	}
+	$uploadarr = wp_upload_dir();
+	$dir = $uploadarr['path'];
+	$url = $uploadarr['url'];
+	foreach ( $metadata['sizes'] as $img ) {
+		$file_url = $url . DIRECTORY_SEPARATOR . $img['file'];
+		if(is_cdn_file($file_url)) {
+			$file_path = $dir . DIRECTORY_SEPARATOR . $img['file'];
+			yet_upyun_sync_file($file_path, ABSPATH);
+		}
+	}
+	return $metadata;
+}
