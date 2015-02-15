@@ -1,9 +1,16 @@
 <?php
 function yet_upyun_filter_content($content) {
-	$html = preg_replace_callback(
+	//替换图片链接
+	$string = preg_replace_callback(
 		'#(<img\s[^>]*src)="([^"]+)"#',
 		'yet_upyun_callback_filter_img',
 		$content
+	);
+	//替换包裹图片的<a>链接
+	$html = preg_replace_callback(
+		'#(<a\s[^>]*href)="([^"]+)"#',
+		'yet_upyun_callback_filter_img',
+		$string
 	);
 	return $html;
 }
@@ -17,7 +24,7 @@ function yet_upyun_callback_filter_img($match) {
 	return $img . "=\"$src\"";
 }
 
-function yet_upyun_filter_js($src) {
+function yet_upyun_filter_src($src) {
 	$wpurl = get_bloginfo('wpurl');
 	if(strpos($src, $wpurl) === false) {
 		return $src;

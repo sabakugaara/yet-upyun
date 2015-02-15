@@ -48,10 +48,14 @@ function yet_upyun_menu() {
 
 
 if(! is_admin()) {
+    //todo: add switch use upyun cdn
     $upyun_service = true;
     if($upyun_service) {
+        //替换图片链接
         add_filter('the_content', 'yet_upyun_filter_content');
-        add_filter('script_loader_src', 'yet_upyun_filter_js');
+        //替换js 和 css链接
+        add_filter('script_loader_src', 'yet_upyun_filter_src');
+        add_filter('style_loader_src', 'yet_upyun_filter_src');
     }
 } else {
     //手动同步所有文件
@@ -59,16 +63,12 @@ if(! is_admin()) {
     //上传附件时 同步原图
     add_action('add_attachment', 'yet_upyun_sync_attachment');
     //上传附件时 同步缩略图
-    //由于没有找到合适的action， 试用该filter作为钩子
+    //由于没有找到合适的action， 使用该filter作为钩子
     add_filter('wp_generate_attachment_metadata', 'yet_upyun_sync_thumbnail', 10, 2);
 }
 
 function yet_upyun_init() {
     yet_upyun_register_basic_settings();
-    /*
-    $plugin_dir = basename( dirname( __FILE__ ) );
-    load_plugin_textdomain( 'yet_upyun', null, $plugin_dir );
-    */
 }
 
 function yet_upyun_register_basic_settings() {

@@ -36,11 +36,8 @@ function in_sync_dir($file_url) {
 }
 
 function yet_upyun_get_ext($file_url) {
+	//ver string i.e: ver=4.1 or ver=14323434
+	$file_url = remove_query_arg('ver', $file_url);
 	$ext = pathinfo($file_url, PATHINFO_EXTENSION);
-	//hack for js?ver=14034323422
-	if(preg_match('!^(\w*)!', $ext, $matches)) {
-		return $matches[1];
-	} else {
-		return $ext;
-	}
+	return $ext;
 }
